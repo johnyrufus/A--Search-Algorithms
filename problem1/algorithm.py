@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Authors: Chris Falter, Johny Rufus, and Xing Liu
+Authors: Chris Falter, Johny Rufus John, and Xing Liu
 """
 
-from mapInfo import gpsInfo, roadInfo
-import pandas as pd
 from enum import enum
 
 class CostFunction(enum):
@@ -40,40 +38,15 @@ class SearchAlgorithm():
         self.costFunc
         
     def search():
+        '''
+        In theory, any logic common to all the search implementations could be coded here;
+        then a child class could call this function (SearchAlgorithm.search(self))
+        before continuing with its particular logic. However, this seems unlikely.
+        Probably this will just remain a stub, and all the logic will be 
+        implemented in the search() function of child classes
+        '''
         pass
     
-class BFS(SearchAlgorithm):
-    '''
-    implements the breadth-first search algorithm
-    '''
-    
-    def search():
-        pass
-    
-class Uniform(SearchAlgorithm):
-    '''
-    implements the uniform search algorithm
-    '''
-    
-    def search():
-        pass
-
-class DFS(SearchAlgorithm):
-    '''
-    implements the depth-first search algorithm
-    '''
-    
-    def search():
-        pass
-    
-class AStar(SearchAlgorithm):
-    '''
-    implements the A* search algorithm
-    '''
-    
-    def search():
-        pass
-
 
 
 

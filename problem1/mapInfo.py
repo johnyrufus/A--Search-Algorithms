@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Authors: Chris Falter, Johny Rufus, and Xing Liu
+Authors: Chris Falter, Johny Rufus John, and Xing Liu
 """
 
 import pandas as pd

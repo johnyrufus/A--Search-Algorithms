@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 """
-Authors: Chris Falter, Johny Rufus, and Xing Liu
+Authors: Chris Falter, Johny Rufus John, and Xing Liu
 """
 
 from mapInfo import gpsInfo, roadInfo
-from algorithm import BFS, Uniform, DFS, AStar, CostFunction, Solution
+from algorithm import CostFunction
+from bfs import BFS
+from dfs import DFS
+from uniform import Uniform
+from astar import AStar
 import sys
 
 def getRouteInfo(solutionPath, roadDf):
