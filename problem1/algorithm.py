@@ -32,6 +32,10 @@ class Solution():
 class SearchAlgorithm():
     
     def __init__(self, gpsDf, roadDf, start, goal, costFunc):
+        '''
+        Common initialization routine for all search implementation classes. 
+        Cost function instances/logic could be initialized here. 
+        '''
         self.gpsDf, self.roadDf = gpsDf, roadDf
         self.start = start
         self.goal = goal
