@@ -2,10 +2,10 @@
 """
 Authors: Chris Falter, Johny Rufus John, and Xing Liu
 """
-
+import os
 import pandas as pd
 
-class gpsInfo():
+class GpsInfo():
     '''
     manages gps info for map search problem, assignment 1 problem 1
     sample code:
@@ -15,17 +15,21 @@ class gpsInfo():
         # fetch/manipulate data in the DataFrame
     '''
 
-    def __init__(self, folder_path):
+    def __init__(self, folderPath):
         '''
         loads the file city-gps.txt from the path into a Pandas dataframe. 
         Columns: Location (string), Lat (float), Lon (float), City (string), StateProvince (string)
         Index: Location
         Note that City and StateProvince are derived by parsing the location string
         '''
-        pass
-        # self.df = 
-
-class roadInfo():
+        dataFile = os.path.join(folderPath, 'city-gps.txt')
+        columns = ['Location', 'Lat', 'Lon']
+        df = pd.read_csv(dataFile, sep=' ', names=columns)
+        cities = list(df.apply(lambda row:row['Location'].split(',')[0], axis=1))
+        states = list(df.apply(lambda row:row['Location'].split(',')[1][1:], axis=1))
+        self.df = df.join(pd.DataFrame({'City':cities, 'State':states}))
+        
+class RoadInfo():
     '''
     manages road segment info for map search problem, assignment 1 problem 1
     '''

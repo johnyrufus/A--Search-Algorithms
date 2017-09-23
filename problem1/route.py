@@ -3,7 +3,7 @@
 Authors: Chris Falter, Johny Rufus John, and Xing Liu
 """
 
-from mapInfo import gpsInfo, roadInfo
+from mapInfo import GpsInfo, RoadInfo
 from algorithm import CostFunction
 from bfs import BFS
 from dfs import DFS
@@ -33,8 +33,8 @@ def printSolution(solution, routeInfo):
 
 def main():
     # set up map info
-    gpsDf = gpsInfo('.')
-    roadDf = roadInfo('.')
+    gpsDf = GpsInfo('.')
+    roadDf = RoadInfo('.')
     
     # process command-line args
     start = sys.argv[1]
