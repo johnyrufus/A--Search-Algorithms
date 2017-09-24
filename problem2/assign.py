@@ -61,10 +61,12 @@ class AssignmentState:
         new_groups = list()
         for group in self.groups:
             if remove_user in group.members:
-                if len(group.members) >= 1:
+                if len(group.members) > 1:
                     index = group.members.index(remove_user)
                     new_members = group.members[:index] + group.members[index+1:]
                     new_groups.append(Group(new_members))
+                elif len(group.members) == 1 and len(move_to_group.members) == 0:
+                    return None
             elif group == move_to_group:
                 if len(move_to_group.members) == 0:
                     new_groups.append(group)
@@ -73,11 +75,28 @@ class AssignmentState:
                 new_groups.append(group)
         return AssignmentState(new_groups)
 
-    def get_next_random_neighbor(self):
-        pass
+    def get_next_random_state(self):
+        solver = AssignmentSolver
+        while not self.is_fully_explored():
+            print('users -- randome before')
+            m = random.randint(0, len(solver.users)-1)
+            print('groups -- randome before' + str(len(self.groups)))
+            n = random.randint(0, len(self.groups)-1)
+            print('groups -- randome after' + str(len(self.groups)))
+            s = '{}-{}'.format(m, n)
+            print(self.explored_neighbors)
+            if not s in self.explored_neighbors:
+                self.explored_neighbors.add(s)
+                next_state = self.assign_user_to_group(solver.users[m], self.groups[n])
+                if next_state:
+                    return next_state
 
-    def evaluate(self, k):
-        return (len(self.groups) - 1) * k + reduce(lambda acc, g: acc + g.evaluate(), self.groups, 0)
+    def is_fully_explored(self):
+        print(len(self.explored_neighbors))
+        return len(AssignmentSolver.users) * len(self.groups) == len(self.explored_neighbors)
+
+    def evaluate(self):
+        return (len(self.groups) - 1) * AssignmentSolver.k + reduce(lambda acc, g: acc + g.evaluate(), self.groups, 0)
 
 
 class AssignmentSolver:
