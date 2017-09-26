@@ -15,18 +15,15 @@ import numpy as np
 
 class Node():
     
-    def __init__(self, prevNode, numPrevMoves, state, move, estimatedDistanceToGoal):
-        self.prevNode = prevNode
-        self.numPrevMoves = numPrevMoves
-        self.state = state
-        self.move = move
-        self.estimatedDistanceToGoal = estimatedDistanceToGoal   
+    def __init__(self, prevNode, numPrevMoves, state, move):
+        self.PrevNode = prevNode
+        self.NumPrevMoves = numPrevMoves
+        self.State = state
+        self.Move = move
+        self.EstimatedDistanceToGoal = estimateDistance(state)
+        self.Priority = numPrevMoves + self.EstimatedDistanceToGoal
 
-# list of goal positions for each tile + empty space
-tileGoal = [(3,3),(0,0),(0,1),(0,2),(0,3),(1,0),(1,1),(1,2),(1,3),(2,0),(2,1),(2,2),(2,3),(3,0),(3,1),(3,2)]
-successors = {}
-
-def initSuccessorDict(d):
+def initSuccessorMap(d):
     '''
     builds a set of 6 possible moves for each square on the 4x4 board
     zero-based indexing used for location, per the python/numpy convention; however, the move encoding is one-based
@@ -48,6 +45,18 @@ def initSuccessorDict(d):
     d[(3,2)] = ["D13","D23","D33","L14","R14","R24"]
     d[(3,3)] = ["D14","D24","D34","R14","R24","R34"]
    
+# list of goal positions for each tile + empty space
+tileGoal = [(3,3),(0,0),(0,1),(0,2),(0,3),(1,0),(1,1),(1,2),(1,3),(2,0),(2,1),(2,2),(2,3),(3,0),(3,1),(3,2)]
+successorMap = {}
+initSuccessorMap(successorMap)
+
+def hashPuzzle(puzzle):
+    '''
+    Returns hash of a puzzle state. Converts state to a one-dimensional tuple,
+    then hashes the tuple
+    '''
+    t = tuple(puzzle.reshape(1,16)[0])
+    return hash(t)
         
 def findTile(val, puzzle):
     '''
@@ -104,17 +113,17 @@ def getSuccessors(node):
     return an unordered list of the 6 successors to the puzzle state passed as arg
     '''
     successors = []
-    locationZero = findTile(0, node.state)
-    for move in successors[locationZero]:
-        newPuzzle = node.state.copy()
-        newZero = locationZero
+    zeroPosition = findTile(0, node.State)
+    for move in successorMap[zeroPosition]:
+        newPuzzle = node.State.copy()
+        newZero = zeroPosition
         direction = move[0]
-        numTiles = move[1]
+        numTiles = int(move[1])
         for i in range(numTiles):
             oldZero = newZero
             newZero = getNewZeroPosition(oldZero, direction)
             swapTiles(oldZero, newZero, newPuzzle)
-        successor = Node(node, node.numPrevMoves + 1, newPuzzle, move, estimateDistance(newPuzzle))
+        successor = Node(node, node.NumPrevMoves + 1, newPuzzle, move)
         successors.append(successor)
     return successors
                 
