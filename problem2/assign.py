@@ -4,7 +4,7 @@
 
 import sys
 import random
-import abc
+from datetime import datetime
 from collections import namedtuple
 from functools import reduce
 from itertools import product
@@ -104,7 +104,6 @@ class AssignmentSolver(LocalSearchProblem):
     UserInputs = namedtuple('UserInputs', 'input_file k m n users max_members_in_group')
 
     def __init__(self, user_inputs = None):
-        #self.users, self.max_members_in_group = list(), 3 # change this to 3 in the end
         self.user_inputs = user_inputs if user_inputs else self.get_inputs_from_user()
         super().__init__(AssignmentState(self.user_inputs))
 
@@ -112,6 +111,10 @@ class AssignmentSolver(LocalSearchProblem):
         return AssignmentSolver.UserInputs(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], list(), list())
 
     def initialize(self):
+        random.seed(datetime.now())
+        del self.user_inputs.users[:]
+        self.state = AssignmentState(self.user_inputs)
+
         with open(self.user_inputs.input_file, 'r') as f:
             for line in f:
                 tokens = line.split()

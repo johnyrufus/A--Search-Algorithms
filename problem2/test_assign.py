@@ -3,11 +3,7 @@
 # Johny
 
 import unittest
-import sys
-from assign import AssignmentSolver
-from assign import AssignmentState
-from assign import Group
-from assign import User
+from assign import AssignmentSolver, AssignmentState, Group, User
 from unittest import TestCase
 
 
