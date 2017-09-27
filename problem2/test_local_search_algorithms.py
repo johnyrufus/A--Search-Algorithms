@@ -6,7 +6,8 @@ import unittest
 import math
 from assign import AssignmentSolver, AssignmentState, Group, User
 from local_search_algorithms import LocalSearchAlgorithm, LocalSearchProblem, HillClimbing, \
-    FirstChoiceHillClimbing, RandomRestartHillClimbing, HillClimbingWithSidewaysMove
+    FirstChoiceHillClimbing, RandomRestartHillClimbing, HillClimbingWithSidewaysMove, HillClimbingWithRandomWalk, \
+    SimulatedAnnealing
 from unittest import TestCase
 
 
@@ -57,6 +58,19 @@ class LocalSearchAlgorithmsTest(TestCase):
             min_res = res if res < min_res else min_res
         self.assertEqual(min_res, 342)
 
+    def test_hill_climbing_with_random_walk(self):
+        min_res = math.inf
+        for i in range(8):
+            inputs = AssignmentSolver.UserInputs('input.txt', 160, 31, 10, list(), [3])
+            problem = AssignmentSolver(inputs)
+            problem.initialize()
+
+            algorithm = HillClimbingWithRandomWalk(problem)
+            res = algorithm.search()
+            print(res)
+            min_res = res if res < min_res else min_res
+        self.assertEqual(min_res, 342)
+
     def test_random_restart_hill_climbing(self):
         inputs = AssignmentSolver.UserInputs('input.txt', 160, 31, 10, list(), [3])
         problem = AssignmentSolver(inputs)
@@ -74,6 +88,30 @@ class LocalSearchAlgorithmsTest(TestCase):
         algorithm = RandomRestartHillClimbing(problem, options={'nprocs': 8, 'sideways_moves': True})
         res = algorithm.search()
         self.assertEqual(res, 342)
+
+    def test_random_restart_hill_climbing_with_random_walk(self):
+        inputs = AssignmentSolver.UserInputs('input.txt', 160, 31, 10, list(), [3])
+        problem = AssignmentSolver(inputs)
+        problem.initialize()
+
+        algorithm = RandomRestartHillClimbing(problem, options={'nprocs': 8, 'random_walk': True})
+        res = algorithm.search()
+        self.assertEqual(res, 342)
+
+    def simulated_annealing_test_once(self):
+        inputs = AssignmentSolver.UserInputs('input.txt', 160, 31, 10, list(), [3])
+        problem = AssignmentSolver(inputs)
+        problem.initialize()
+
+        algorithm = SimulatedAnnealing(problem)
+        res = algorithm.search()
+        print(res)
+        #self.assertEqual(res, 342)
+
+    def test_simulated_annealing_repeated(self):
+        for i in range(100):
+            self.simulated_annealing_test_once()
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 # local_search_algorithms.py : Implement the local search algorithms
+# Simulate Annealing schedule function referred from textbook code - https://github.com/aimacode/
 # Johny
 
 import abc
-from multiprocessing import Queue, Process, Pool
+from multiprocessing import Queue, Process
+import random
+import math
+import sys
 
 
 class LocalSearchAlgorithm:
     def __init__(self, problem, options=None):
         self.problem = problem
-        self.options = options
+        self.options = options if options else {}
 
     def search(self):
         pass
@@ -32,7 +36,7 @@ class HillClimbing(LocalSearchAlgorithm):
 
     def search(self):
         next_state = self.problem.state
-        while next_state is not None:
+        while next_state:
             self.problem.state = next_state
             neighbor_min_state = self.problem.state
             next_state = None
@@ -49,7 +53,7 @@ class HillClimbing(LocalSearchAlgorithm):
 class HillClimbingWithSidewaysMove(LocalSearchAlgorithm):
 
     def search(self):
-        max_sideways_moves = self.options['sideways_moves'] if self.options is not None else 100
+        max_sideways_moves = self.options.get('sideways_moves', 100)
         sideways_moves = 0
         next_state = self.problem.state
         while True:
@@ -77,7 +81,7 @@ class FirstChoiceHillClimbing(LocalSearchAlgorithm):
 
     def search(self):
         next_state = self.problem.state
-        while next_state is not None:
+        while next_state:
             self.problem.state = next_state
             neighbor_min_state = self.problem.state
             next_state = None
@@ -92,15 +96,39 @@ class FirstChoiceHillClimbing(LocalSearchAlgorithm):
         return self.problem.state.evaluate()
 
 
+class HillClimbingWithRandomWalk(LocalSearchAlgorithm):
+
+    def search(self):
+        probability = self.options.get('probability', 0.75)
+        next_state = self.problem.state
+        while next_state:
+            self.problem.state = next_state
+            neighbor_min_state = self.problem.state
+            next_state = None
+            neighbor = self.problem.state.next_neighbor()
+            if random.random() > probability:
+                next_state = neighbor
+                continue
+            while neighbor:
+                if neighbor.evaluate() < neighbor_min_state.evaluate():
+                    neighbor_min_state = neighbor
+                neighbor = self.problem.state.next_neighbor()
+            if neighbor_min_state is not self.problem.state:
+                next_state = neighbor_min_state
+        return self.problem.state.evaluate()
+
+
 class RandomRestartHillClimbing(LocalSearchAlgorithm):
 
     def worker(self, q):
         self.problem.initialize()
-        algorithm = None
-        if self.options is not None and 'sideways_moves' in self.options and self.options['sideways_moves'] == True:
+        if self.options.get('sideways_moves', False):
             algorithm = HillClimbingWithSidewaysMove
+        elif self.options.get('random_walk', False):
+            algorithm = HillClimbingWithRandomWalk
         else:
             algorithm = HillClimbing
+        print(algorithm.__name__)
         res = algorithm(self.problem).search()
         q.put(res)
 
@@ -118,6 +146,32 @@ class RandomRestartHillClimbing(LocalSearchAlgorithm):
         for p in procs:
             p.join()
         return min(res)
+
+
+class SimulatedAnnealing(LocalSearchAlgorithm):
+
+    def search(self):
+        next_state = self.problem.state
+        for t in range(sys.maxsize):
+            T = self.exp_schedule(t)
+            if T > 0 and next_state:
+                #print(T)
+                self.problem.state = next_state
+                next_state = None
+                neighbor = self.problem.state.next_neighbor()
+                while neighbor:
+                    delta_e = self.problem.state.evaluate() - neighbor.evaluate()
+                    if delta_e > 0 or math.exp(delta_e / T) > random.uniform(0.0, 1.0):
+                        next_state = neighbor
+                        break
+                    neighbor = self.problem.state.next_neighbor()
+            else:
+                break
+        return self.problem.state.evaluate()
+
+    def exp_schedule(self, t, k=20, lam=0.005, limit=100):
+        return k * math.exp(-lam * t) if t < limit else 0
+
 
 
 
