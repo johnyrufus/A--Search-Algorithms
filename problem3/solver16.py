@@ -12,6 +12,7 @@ The goal state is:
 """
 
 import numpy as np
+from heapq import heappush, heappop
 
 class Node():
     
@@ -22,10 +23,12 @@ class Node():
         self.Move = move
         self.EstimatedDistanceToGoal = estimateDistance(state)
         self.Priority = numPrevMoves + self.EstimatedDistanceToGoal
+        self.Hash = hashPuzzle(state)
+        self.Removed = False
 
 def initSuccessorMap(d):
     '''
-    builds a set of 6 possible moves for each square on the 4x4 board
+    builds a list of 6 possible moves for each empty square on the 4x4 board
     zero-based indexing used for location, per the python/numpy convention; however, the move encoding is one-based
     '''
     d[(0,0)] = ["U11","U21","U31","L11","L21","L31"]
@@ -50,6 +53,9 @@ tileGoal = [(3,3),(0,0),(0,1),(0,2),(0,3),(1,0),(1,1),(1,2),(1,3),(2,0),(2,1),(2
 successorMap = {}
 initSuccessorMap(successorMap)
 
+# the built-in hash has 64 bits on 64-bit platforms. There are 16! permutations 
+# of the puzzle. Probability of no collisions = ((2^64 - 1)/(2^64))^(16!) = 99.77%
+# So we use the built-in hash function 
 def hashPuzzle(puzzle):
     '''
     Returns hash of a puzzle state. Converts state to a one-dimensional tuple,
@@ -77,14 +83,16 @@ def estimateDistance(puzzle):
         goal = tileGoal[i]
         actual = findTile(i, puzzle)
         dist += (abs(goal[0] - actual[0]) + abs(goal[1] - actual[1]))
-    return dist / 3   
+    return dist / 3.0   
     
 def isSolvable(puzzle):
     '''
     puzzle = ndarray(4,4) with elements in range(15)
-    puzzle is solvable iff sum of permutation inversions is even
+    puzzle is solvable iff sum of permutation inversions is equal to parity
+    parity is odd if 0-tile is in an odd row (zero-based), even if 0-tile is in an even row
     '''
-    parity = 0
+    parity = (findTile(0, puzzle)[0] + 1) % 2
+    inversions = 0
     puzzle = puzzle.reshape(1,16)[0]
     for i in range(15):
         n = puzzle[i]
@@ -94,8 +102,8 @@ def isSolvable(puzzle):
             if puzzle[m] == 0:
                 continue
             if puzzle[m] < n:
-                parity = parity + 1
-    return (parity % 2 == 0)
+                inversions = inversions + 1
+    return (inversions % 2 == parity)
 
 def swapTiles(pos1, pos2, puzzle):
     '''
@@ -126,9 +134,74 @@ def getSuccessors(node):
         successor = Node(node, node.NumPrevMoves + 1, newPuzzle, move)
         successors.append(successor)
     return successors
-                
-                
-                
+
+def getSolutionMoves(node):
+    '''
+    given the goal node, returns a list of moves from initial state to goal
+    '''
+    moves = []
+    while (node.Move):
+        moves.append(node.Move)
+        node = node.PrevNode
+    return list(reversed(moves))
+    
+
+class AStar():
+
+    def __init__(self, initialState):               
+        if not isSolvable(initialState):
+            raise ValueError("puzzle cannot be solved!")
+        self.closed = set()
+        self.fringe = []
+        self.nodeFinder = {}
+        startNode = Node(None, 0, initialState, None)
+        self.addToFringe(startNode)
         
+    def addToFringe(self, node):
+        if node.Hash in self.closed:
+            return
+        if node.Hash in self.nodeFinder.keys():
+            prevNode = self.nodeFinder[node.Hash]
+            if prevNode.Priority <= node.Priority:
+                return
+            # remove the previous node, the new node will take its place
+            del self.nodeFinder[node.Hash]
+            prevNode.Removed = True
+        heappush(self.fringe, [node.Priority, node])
+        self.nodeFinder[node.Hash] = node
+        
+    def popFromFringe(self):
+        _, node = heappop(self.fringe)
+        if node.Removed:
+            return self.popFromFringe()
+        del self.nodeFinder[node.Hash]
+        self.closed.add(node.Hash)
+        return node
+    
+    def solve(self):
+        '''
+        Returns a list of the moves from initial state to goal state. Since A*
+        search is used, the path is optimal. If no path is found, throws a
+        RuntimeError
+        '''
+        while(len(self.fringe) > 0):
+            node = self.popFromFringe()
+            if node.EstimatedDistanceToGoal == 0:
+                # we found the goal state!
+                return getSolutionMoves(node)
+            for n in getSuccessors(node):
+                self.addToFringe(n)
+        raise RuntimeError("Did not find a solution")
+        
+def main():
+    initialState =  np.array([[1,2,3,4],[5,6,7,8],[9,10,15,11],[13,14,0,12]])
+    solver = AStar(initialState)
+    actual = solver.solve()
+    print actual
+    
+if __name__ == '__main__':
+    main()
+
+            
         
             
