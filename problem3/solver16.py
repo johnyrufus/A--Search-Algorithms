@@ -199,18 +199,18 @@ class AStar():
         self.nodeFinder = {}
         startNode = Node(None, 0, initialState, None)
         self.addToFringe(startNode)
-        self.removed = 0
-        self.ignoredClosed = 0
-        self.ignoredPriority = 0
+#        self.removed = 0
+#        self.ignoredClosed = 0
+#        self.ignoredPriority = 0
         
     def addToFringe(self, node):
         if node.Hash in self.closed:
-            self.ignoredClosed += 1
+#            self.ignoredClosed += 1
             return
-        if node.Hash in self.nodeFinder.keys():
-            prevNode = self.nodeFinder[node.Hash]
+        prevNode = self.nodeFinder.get(node.Hash)
+        if prevNode:
             if prevNode.Priority <= node.Priority:
-                self.ignoredPriority += 1
+#                self.ignoredPriority += 1
                 return
             # remove the previous node, the new node will take its place
             del self.nodeFinder[node.Hash]
@@ -221,7 +221,7 @@ class AStar():
     def popFromFringe(self):
         _, node = heappop(self.fringe)
         if node.Removed:
-            self.removed += 1
+#            self.removed += 1
             return self.popFromFringe()
         del self.nodeFinder[node.Hash]
         self.closed.add(node.Hash)
@@ -237,11 +237,11 @@ class AStar():
             node = self.popFromFringe()
             if node.EstimatedMoves == 0:
                 # we found the goal state!
-                print "Number of nodes ignored because already in closed: : " + str(self.ignoredClosed)
-                print "Number of nodes ignored because already in fringe: " + str(self.ignoredPriority)
-                print "Number of nodes removed nodes encountered: " + str(self.removed)
-                print "Number of nodes in closed: " + str(len(self.closed))
-                print "Number of nodes in fringe: " + str(len(self.fringe))
+#                print "Number of nodes ignored because already in closed: : " + str(self.ignoredClosed)
+#                print "Number of nodes ignored because already in fringe: " + str(self.ignoredPriority)
+#                print "Number of nodes removed nodes encountered: " + str(self.removed)
+#                print "Number of nodes in closed: " + str(len(self.closed))
+#                print "Number of nodes in fringe: " + str(len(self.fringe))
                 return getSolutionMoves(node)
             for n in getSuccessors(node):
                 self.addToFringe(n)
