@@ -3,14 +3,14 @@
 # Johny
 
 import unittest
-from assign import AssignmentSolver, AssignmentState, Group, User
+from assign import AssignmentSolver, AssignmentState, Group, User, UserInputs
 from unittest import TestCase
 
 
 class AssignmentSolverTest(TestCase):
 
     def test_basic_groups1(self):
-        inputs = AssignmentSolver.UserInputs('input.txt', 160, 31, 10, list(), [1])
+        inputs = UserInputs('input.txt', 160, 31, 10, list(), [1])
         solver = AssignmentSolver(inputs)
         solver.initialize()
 
@@ -20,7 +20,7 @@ class AssignmentSolverTest(TestCase):
         self.assertEqual(solver.state.evaluate(), 1012)
 
     def test_basic_groups2(self):
-        inputs = AssignmentSolver.UserInputs('input.txt', 160, 31, 10, list(), [3])
+        inputs = UserInputs('input.txt', 160, 31, 10, list(), [3])
         solver = AssignmentSolver(inputs)
         solver.initialize()
 
@@ -42,7 +42,7 @@ class AssignmentSolverTest(TestCase):
         self.assertEqual(solver.state.evaluate(), 534)
 
     def test_assign_user_to_group(self):
-        inputs = AssignmentSolver.UserInputs('input.txt', 160, 31, 10, list(), [3])
+        inputs = UserInputs('input.txt', 160, 31, 10, list(), [3])
         solver = AssignmentSolver(inputs)
         solver.initialize()
 
@@ -62,11 +62,11 @@ class AssignmentSolverTest(TestCase):
         self.assertEqual(solver.state.evaluate(), 375)
 
     def test_state_generation1(self):
-        inputs = AssignmentSolver.UserInputs('input.txt', 160, 31, 10, list(), [1])
+        inputs = UserInputs('input.txt', 160, 31, 10, list(), [1])
         solver = AssignmentSolver(inputs)
         solver.initialize()
 
-        inputs = AssignmentSolver.UserInputs('input.txt', 160, 31, 10, inputs.users, [3])
+        inputs = UserInputs('input.txt', 160, 31, 10, inputs.users, [3])
         solver.inputs = inputs
         solver.state.inputs = inputs
 
@@ -78,11 +78,11 @@ class AssignmentSolverTest(TestCase):
         self.assertEqual(count, 30)
 
     def test_state_generation2(self):
-        inputs = AssignmentSolver.UserInputs('input_small.txt', 160, 31, 10, list(), [1])
+        inputs = UserInputs('input_small.txt', 160, 31, 10, list(), [1])
         solver = AssignmentSolver(inputs)
         solver.initialize()
 
-        inputs = AssignmentSolver.UserInputs('input_small.txt', 160, 31, 10, inputs.users, [3])
+        inputs = UserInputs('input_small.txt', 160, 31, 10, inputs.users, [3])
         solver.inputs = inputs
         solver.state.inputs = inputs
 

@@ -4,10 +4,13 @@
 # Johny
 
 import abc
-from multiprocessing import Queue, Process
+import assign
+from multiprocessing import Queue, Process, Pool
+
 import random
 import math
 import sys
+import copy
 
 
 class LocalSearchAlgorithm:
@@ -25,6 +28,10 @@ class LocalSearchProblem:
 
     @abc.abstractmethod
     def next_neighbor(self):
+        return
+
+    @abc.abstractmethod
+    def next_neighbor_for_user(self, user_index):
         return
 
     @abc.abstractmethod
@@ -47,7 +54,10 @@ class HillClimbing(LocalSearchAlgorithm):
                 neighbor = self.problem.state.next_neighbor()
             if neighbor_min_state is not self.problem.state:
                 next_state = neighbor_min_state
-        return self.problem.state.evaluate()
+        #print('------------' + str(self.problem.state.evaluate()))
+        #print(self.problem.state.groups)
+        return self.problem.state
+
 
 
 class HillClimbingWithSidewaysMove(LocalSearchAlgorithm):
@@ -74,7 +84,7 @@ class HillClimbingWithSidewaysMove(LocalSearchAlgorithm):
             else:
                 sideways_moves = 0
             next_state = neighbor_min_state
-        return self.problem.state.evaluate()
+        return self.problem.state
 
 
 class FirstChoiceHillClimbing(LocalSearchAlgorithm):
@@ -93,13 +103,13 @@ class FirstChoiceHillClimbing(LocalSearchAlgorithm):
                 neighbor = self.problem.state.next_neighbor()
             if neighbor_min_state is not self.problem.state:
                 next_state = neighbor_min_state
-        return self.problem.state.evaluate()
+        return self.problem.state
 
 
 class HillClimbingWithRandomWalk(LocalSearchAlgorithm):
 
     def search(self):
-        probability = self.options.get('probability', 0.75)
+        probability = self.options.get('probability', 0.80)
         next_state = self.problem.state
         while next_state:
             self.problem.state = next_state
@@ -115,7 +125,7 @@ class HillClimbingWithRandomWalk(LocalSearchAlgorithm):
                 neighbor = self.problem.state.next_neighbor()
             if neighbor_min_state is not self.problem.state:
                 next_state = neighbor_min_state
-        return self.problem.state.evaluate()
+        return self.problem.state
 
 
 class RandomRestartHillClimbing(LocalSearchAlgorithm):
@@ -128,7 +138,7 @@ class RandomRestartHillClimbing(LocalSearchAlgorithm):
             algorithm = HillClimbingWithRandomWalk
         else:
             algorithm = HillClimbing
-        print(algorithm.__name__)
+        #print(algorithm.__name__)
         res = algorithm(self.problem).search()
         q.put(res)
 
@@ -142,17 +152,17 @@ class RandomRestartHillClimbing(LocalSearchAlgorithm):
             p.start()
 
         res = [q.get() for _ in range(nprocs)]
-        print(res)
+        #print(res)
         for p in procs:
             p.join()
-        return min(res)
+        return min(res, key=lambda x: x.evaluate())
 
 
 class SimulatedAnnealing(LocalSearchAlgorithm):
 
     def search(self):
         next_state = self.problem.state
-        for t in range(sys.maxsize):
+        for t in range(1,sys.maxsize):
             T = self.exp_schedule(t)
             if T > 0 and next_state:
                 #print(T)
@@ -167,10 +177,12 @@ class SimulatedAnnealing(LocalSearchAlgorithm):
                     neighbor = self.problem.state.next_neighbor()
             else:
                 break
-        return self.problem.state.evaluate()
+        return self.problem.state
 
-    def exp_schedule(self, t, k=20, lam=0.005, limit=100):
+    def exp_schedule(self, t, k=20, lam=0.00001, limit=10000):
+        #print(t)
         return k * math.exp(-lam * t) if t < limit else 0
+
 
 
 
