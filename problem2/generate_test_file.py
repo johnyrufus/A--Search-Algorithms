@@ -2,7 +2,7 @@ import random
 from datetime import datetime
 
 n = 50
-limit = 10
+limit = 3
 
 
 def generate_test_file():
@@ -12,10 +12,10 @@ def generate_test_file():
 
     lines = []
     for i,user in enumerate(users):
-        group_size = random.randint(0, limit-1)
-        likes = random.sample(users[:i]+users[i+1:], random.randint(0, limit-2))
+        group_size = random.randint(0, limit)
+        likes = random.sample(users[:i]+users[i+1:], random.randint(0, limit-1))
         dislikes_eligible = set(users) - set(likes + [user])
-        dislikes = random.sample(list(dislikes_eligible), random.randint(0, min(limit-1,len(dislikes_eligible)-1)))
+        dislikes = random.sample(list(dislikes_eligible), random.randint(0, len(dislikes_eligible)-1))
         likes_str = '_' if len(likes) == 0 else ','.join(likes)
         dislikes_str = '_' if len(dislikes) == 0 else ','.join(dislikes)
         lines.append(' '.join([user, str(group_size), likes_str, dislikes_str]))
