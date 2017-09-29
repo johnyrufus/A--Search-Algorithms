@@ -187,7 +187,7 @@ if __name__ == '__main__':
 	# astar
 	if route_alg == 'astar':
 		if cost_func == 'segments':
-			# if cost is number of segments assume same with BFS (TODO: whats the heuristic function now?)
+			# if cost is number of segments assume same with BFS 
 			path = BFS(start_city, end_city)
 		else:
 			path = ASTAR(start_city, end_city, cost_func)
