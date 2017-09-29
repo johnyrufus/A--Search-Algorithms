@@ -27,7 +27,7 @@ class Group:
         self.members = members
 
     def __repr__(self):
-        return "Members - {}, Score - {} \n".format([m.user_id for m in self.members], self.evaluate())
+        return "Members - {} \n".format([m.user_id for m in self.members])
 
     def evaluate(self, inputs):
         fav_count = 0
@@ -99,16 +99,17 @@ class AssignmentState:
     def next_neighbor(self):
         return self.get_next_random_state()
 
+UserInputs = namedtuple('UserInputs', 'input_file k m n users max_members_in_group')
+
 
 class AssignmentSolver(LocalSearchProblem):
-    UserInputs = namedtuple('UserInputs', 'input_file k m n users max_members_in_group')
 
     def __init__(self, user_inputs = None):
         self.user_inputs = user_inputs if user_inputs else self.get_inputs_from_user()
         super().__init__(AssignmentState(self.user_inputs))
 
     def get_inputs_from_user(self):
-        return AssignmentSolver.UserInputs(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], list(), list())
+        return UserInputs(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], list(), list())
 
     def initialize(self):
         random.seed(datetime.now())
