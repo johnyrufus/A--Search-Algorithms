@@ -11,11 +11,11 @@ from local_search_algorithms import LocalSearchAlgorithm, LocalSearchProblem, Hi
 from unittest import TestCase
 
 input_file = 'input_large_50.txt'
-nprocs = 16
+nprocs = 32
 
 class LocalSearchAlgorithmsTest(TestCase):
 
-    def test_hill_climbing1(self):
+    '''def test_hill_climbing1(self):
         inputs = UserInputs(input_file, 160, 31, 10, list(), [1])
         problem = AssignmentSolver(inputs)
         problem.initialize()
@@ -71,7 +71,7 @@ class LocalSearchAlgorithmsTest(TestCase):
             res = algorithm.search().evaluate()
             print(res)
             min_res = res if res < min_res else min_res
-        self.assertEqual(min_res, 342)
+        self.assertEqual(min_res, 342)'''
 
     def test_random_restart_hill_climbing(self):
         inputs = UserInputs(input_file, 160, 31, 10, list(), [3])
@@ -88,21 +88,20 @@ class LocalSearchAlgorithmsTest(TestCase):
         problem = AssignmentSolver(inputs)
         problem.initialize()
 
-        algorithm = RandomRestartHillClimbing(problem, options={'nprocs': 16, 'sideways_moves': True})
+        algorithm = RandomRestartHillClimbing(problem, options={'nprocs': nprocs, 'sideways_moves': True})
         res = algorithm.search().evaluate()
         print(res)
         #self.assertEqual(res, 342)
 
     def test_random_restart_hill_climbing_with_random_walk(self):
-        for i in range(20):
-            inputs = UserInputs(input_file, 160, 31, 10, list(), [3])
-            problem = AssignmentSolver(inputs)
-            problem.initialize()
+        inputs = UserInputs(input_file, 160, 31, 10, list(), [3])
+        problem = AssignmentSolver(inputs)
+        problem.initialize()
 
-            algorithm = RandomRestartHillClimbing(problem, options={'nprocs': 16, 'random_walk': True})
-            res = algorithm.search().evaluate()
-            print(res)
-            #self.assertEqual(res, 342)
+        algorithm = RandomRestartHillClimbing(problem, options={'nprocs': nprocs, 'random_walk': True})
+        res = algorithm.search().evaluate()
+        print(res)
+        #self.assertEqual(res, 342)
 
     def simulated_annealing_test_once(self):
         inputs = UserInputs(input_file, 160, 31, 10, list(), [3])
@@ -117,7 +116,7 @@ class LocalSearchAlgorithmsTest(TestCase):
     def test_simulated_annealing_repeated(self):
         res = min(self.simulated_annealing_test_once() for x in range(1))
         print(res)
-        # self.assertEqual(res, 342)'''
+        # self.assertEqual(res, 342)
 
 if __name__ == '__main__':
     unittest.main()
