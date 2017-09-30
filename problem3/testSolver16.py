@@ -4,7 +4,7 @@ Authors: Chris Falter, Johny Rufus John, and Xing Liu
 Test the 15-tile puzzle solver code
 """
 import unittest
-from solver16 import findTile, isSolvable, estimateMoves, hashPuzzle, getSuccessors, Node, AStar
+from solver16 import findTile, isSolvable, estimateMoves, hashPuzzle, getSuccessors, Node, AStar, readFile
 import numpy as np
 
 class TestSolver16(unittest.TestCase):
@@ -123,6 +123,12 @@ class TestSolver16(unittest.TestCase):
         solver = AStar(initialState)
         actual = solver.solve()
         self.assertListEqual(expected, actual)
+        
+    def test_readFile_ReturnsNdarray(self):
+        filePath = './testPosition.txt'
+        expected = np.array([[1,2,3,4],[5,6,7,8],[9,0,10,12],[13,15,14,11]])
+        actual = readFile(filePath)
+        self.assertTrue(np.array_equal(expected, actual))
         
 if __name__ == '__main__':
     unittest.main()

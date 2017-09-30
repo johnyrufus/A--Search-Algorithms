@@ -11,6 +11,7 @@ The goal state is:
 13 14 15 --
 """
 
+import sys
 import numpy as np
 from heapq import heappush, heappop
 
@@ -246,12 +247,20 @@ class AStar():
             for n in getSuccessors(node):
                 self.addToFringe(n)
         raise RuntimeError("Did not find a solution")
+
+def readFile(filePath):
+    '''
+    reads the text file at filePath and returns an array representing puzzle state
+    '''
+    state = np.genfromtxt(filePath, dtype='uint8', delimiter = ' ')
+    return state
         
 def main():
-    initialState =  np.array([[1,2,3,4],[5,6,7,8],[9,10,15,11],[13,14,0,12]])
+    initialStateFile = sys.argv[1]
+    initialState =  readFile(initialStateFile)
     solver = AStar(initialState)
-    actual = solver.solve()
-    print actual
+    path = solver.solve()
+    print ' '.join(path)
     
 if __name__ == '__main__':
     main()
