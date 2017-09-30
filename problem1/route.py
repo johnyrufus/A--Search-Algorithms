@@ -1,6 +1,34 @@
-# Author: Xing Liu
+#!/usr/bin/env python
 
-# 
+# Xing Liu
+
+# (1) If just considering the minimal cost, for routing option requiring minimal segments change, 
+# the BFS/UNIFORM/ASTAR are equally good, for routing option requiring minimal total distance and
+# time consuming, the UNIFORM/ASTAR are equally good.
+
+# (2) Testing city pair: Bloomington,_Indiana Chicago,_Illinois
+# algorithm cost_function running_time
+#    BFS        N/A            0.294
+#    DFS        N/A            0.951
+#  UNIFORM    segments         0.294
+#  UNIFORM    distance         0.314
+#  UNIFORM      time           0.317
+#    ASTAR    segments         0.299
+#    ASTAR    distance         0.320
+#    ASTAR      time           0.845
+#
+# Comparing BFS and DFS, BFS only requires 31% of the running time that DFS takes.
+# Comparing UNIFORM and ASTAR, on average UNIFORM is faster, and on average it requires 54% of the running time that ASTAR takes.
+
+# (4) For distance the heuristic function I am using is the great circle distance given longitude and latitude of the two city,
+# this heuristic function is admissible and consistent, it's working good and can find the routing solution with minimal distance, 
+# to make it better I will check whether there exist direct path to the goal even if pyhsically the city is close to the goal. 
+
+# For time the heuristic function I am using is the great circle distance/maximal speed limit, given longitude and latitude of the 
+# two city, this heuristic function is admissible and consistent, it's working good and can find the routing solution with minimal 
+# time, to make it better I will check whether there exist direct path to the goal even if pyhsically the city is close to the goal,
+# also it will be helpful to take different speed limit into consideration since short path with low spped limit might takes longer 
+# time to travel. 
 
 import sys
 import numpy as np
