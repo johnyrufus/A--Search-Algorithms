@@ -116,7 +116,8 @@ def estimateDistance(puzzle):
         actual = findTile(i , puzzle)
         distL1 += (abs(goal[0] - actual[0]) + abs(goal[1] - actual[1]))
     return distL1
-    
+
+goalCenter = np.array([[6,7],[10,11]])    
 def estimateMoves(puzzle):
     '''
     puzzle = ndarray(4,4) with elements in range(15)
@@ -125,9 +126,12 @@ def estimateMoves(puzzle):
     Divided by 3 because of the ability to slide 3 tiles in a single move
     Inspired by https://algorithmsinsight.wordpress.com/graph-theory-2/a-star-in-general/implementing-a-star-to-solve-n-puzzle/
     '''
+    tilesPerMove = 2.9
+#    if np.array_equal(puzzle[1:3,1:3], goalCenter):
+#        tilesPerMove = 3.0
     distL1 = estimateDistance(puzzle)
     linearConflicts = getLinearConflicts(puzzle)
-    return ((distL1 + 2 * linearConflicts) / 3.0)   
+    return ((distL1 + 2 * linearConflicts) / tilesPerMove)   
     
 def isSolvable(puzzle):
     '''
@@ -200,18 +204,18 @@ class AStar():
         self.nodeFinder = {}
         startNode = Node(None, 0, initialState, None)
         self.addToFringe(startNode)
-#        self.removed = 0
-#        self.ignoredClosed = 0
-#        self.ignoredPriority = 0
+        self.removed = 0
+        self.ignoredClosed = 0
+        self.ignoredPriority = 0
         
     def addToFringe(self, node):
         if node.Hash in self.closed:
-#            self.ignoredClosed += 1
+            self.ignoredClosed += 1
             return
         prevNode = self.nodeFinder.get(node.Hash)
         if prevNode:
             if prevNode.Priority <= node.Priority:
-#                self.ignoredPriority += 1
+                self.ignoredPriority += 1
                 return
             # remove the previous node, the new node will take its place
             del self.nodeFinder[node.Hash]
@@ -222,7 +226,7 @@ class AStar():
     def popFromFringe(self):
         _, node = heappop(self.fringe)
         if node.Removed:
-#            self.removed += 1
+            self.removed += 1
             return self.popFromFringe()
         del self.nodeFinder[node.Hash]
         self.closed.add(node.Hash)
@@ -238,11 +242,11 @@ class AStar():
             node = self.popFromFringe()
             if node.EstimatedMoves == 0:
                 # we found the goal state!
-#                print "Number of nodes ignored because already in closed: : " + str(self.ignoredClosed)
-#                print "Number of nodes ignored because already in fringe: " + str(self.ignoredPriority)
-#                print "Number of nodes removed nodes encountered: " + str(self.removed)
-#                print "Number of nodes in closed: " + str(len(self.closed))
-#                print "Number of nodes in fringe: " + str(len(self.fringe))
+                print "Number of nodes ignored because already in closed: : " + str(self.ignoredClosed)
+                print "Number of nodes ignored because already in fringe: " + str(self.ignoredPriority)
+                print "Number of nodes removed nodes encountered: " + str(self.removed)
+                print "Number of nodes in closed: " + str(len(self.closed))
+                print "Number of nodes in fringe: " + str(len(self.fringe))
                 return getSolutionMoves(node)
             for n in getSuccessors(node):
                 self.addToFringe(n)
@@ -257,7 +261,10 @@ def readFile(filePath):
         
 def main():
     initialStateFile = sys.argv[1]
-    initialState =  readFile(initialStateFile)
+    initialState = readFile(initialStateFile)
+    if not isSolvable(initialState):
+        print "Initial state cannot be solved!"
+        return
     solver = AStar(initialState)
     path = solver.solve()
     print ' '.join(path)

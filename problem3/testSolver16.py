@@ -26,10 +26,11 @@ class TestSolver16(unittest.TestCase):
         self.assertTrue(isSolvable(puzzle))
         
     def test_estimateDistance_ReturnsCorrectValue(self):
+        tilesPerMove = 2.9
         puzzle0 = np.array([[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15]])
         puzzle1 = np.array([[3,1,2,4],[5,6,7,8],[9,10,11,12],[13,14,15,0]])
         puzzle2 = np.array([[1,2,3,4],[7,5,6,12],[11,9,10,8],[13,14,15,0]])
-        distToPuzzle = {8:puzzle0, (8/3.0):puzzle1, (20/3.0):puzzle2}
+        distToPuzzle = {(24/tilesPerMove):puzzle0, (8/tilesPerMove):puzzle1, (20/tilesPerMove):puzzle2}
         for dist, puzzle in distToPuzzle.items():
             self.assertEquals(estimateMoves(puzzle), dist)        
         
@@ -123,6 +124,15 @@ class TestSolver16(unittest.TestCase):
         solver = AStar(initialState)
         actual = solver.solve()
         self.assertListEqual(expected, actual)
+        
+    def test_Solve_WithFixedCenter_FindsSolution(self):
+        print "Fixed Center"
+        initialState = np.array([[0,15,14,13],[12,6,7,9],[8,10,11,5],[4,3,2,1]])
+        expected = ['U31','L34','D34','R31'] * 5 + ['U31','L34']
+        solver = AStar(initialState)
+        actual = solver.solve()
+        self.assertListEqual(expected, actual)
+        
         
     def test_readFile_ReturnsNdarray(self):
         filePath = './testPosition.txt'
