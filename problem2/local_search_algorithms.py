@@ -163,7 +163,7 @@ class RandomRestartHillClimbingHybrid(LocalSearchAlgorithm):
         algorithms = {0: HillClimbingWithRandomWalk, 1: HillClimbingWithSidewaysMove}
         self.problem.initialize()
         algorithm = algorithms[i%2]
-        print(algorithm.__name__)
+        #print(algorithm.__name__)
         res = algorithm(self.problem).search()
         q.put(res)
 
