@@ -157,11 +157,36 @@ class RandomRestartHillClimbing(LocalSearchAlgorithm):
         return min(res, key=lambda x: x.evaluate())
 
 
+class RandomRestartHillClimbingHybrid(LocalSearchAlgorithm):
+
+    def worker(self, q, i):
+        algorithms = {0: HillClimbingWithRandomWalk, 1: HillClimbingWithSidewaysMove, 2: SimulatedAnnealing }
+        self.problem.initialize()
+        #print(algorithm.__name__)
+        res = algorithms[i%3](self.problem).search()
+        q.put(res)
+
+    def search(self):
+        q = Queue()
+        nprocs = self.options['nprocs'] if 'nprocs' in self.options else 32
+        procs = list()
+        for i in range(nprocs):
+            p = Process(target=self.worker, args=(q, i))
+            procs.append(p)
+            p.start()
+
+        res = [q.get() for _ in range(nprocs)]
+        #print(res)
+        for p in procs:
+            p.join()
+        return min(res, key=lambda x: x.evaluate())
+
+
 class SimulatedAnnealing(LocalSearchAlgorithm):
 
     def search(self):
         next_state = self.problem.state
-        for t in range(1,sys.maxsize):
+        for t in range(1, sys.maxsize):
             T = self.exp_schedule(t)
             if T > 0 and next_state:
                 #print(T)
@@ -178,7 +203,7 @@ class SimulatedAnnealing(LocalSearchAlgorithm):
                 break
         return self.problem.state
 
-    def exp_schedule(self, t, k=20, lam=0.00001, limit=10000):
+    def exp_schedule(self, t, k=20, lam=0.005, limit=100):
         #print(t)
         return k * math.exp(-lam * t) if t < limit else 0
 

@@ -7,7 +7,7 @@ import math
 from assign import AssignmentSolver, AssignmentState, Group, User, UserInputs
 from local_search_algorithms import LocalSearchAlgorithm, LocalSearchProblem, HillClimbing, \
     FirstChoiceHillClimbing, RandomRestartHillClimbing, HillClimbingWithSidewaysMove, HillClimbingWithRandomWalk, \
-    SimulatedAnnealing
+    SimulatedAnnealing, RandomRestartHillClimbingHybrid
 from unittest import TestCase
 
 input_file = 'input_large_50.txt'
@@ -21,11 +21,12 @@ class LocalSearchAlgorithmsTest(TestCase):
         problem.initialize()
 
         algorithm = HillClimbing(problem)
-        self.assertEqual(algorithm.search().evaluate(), 1012)
+        #self.assertEqual(algorithm.search().evaluate(), 1012)
 
     def test_hill_climbing2(self):
         min_res = math.inf
-        for i in range(8):
+        print('hill_climbing ------ :')
+        for i in range(10):
             inputs = UserInputs(input_file, 160, 31, 10, list(), [3])
             problem = AssignmentSolver(inputs)
             problem.initialize()
@@ -33,10 +34,12 @@ class LocalSearchAlgorithmsTest(TestCase):
             algorithm = HillClimbing(problem)
             res = algorithm.search().evaluate()
             min_res = res if res < min_res else min_res
-        self.assertEqual(min_res, 342)
+            print(res)
+        #self.assertEqual(min_res, 342)
 
     def test_first_choice_hill_climbing(self):
         min_res = math.inf
+        print('first_choice_hill_climbing ------ :')
         for i in range(10):
             inputs = UserInputs(input_file, 160, 31, 10, list(), [3])
             problem = AssignmentSolver(inputs)
@@ -45,11 +48,13 @@ class LocalSearchAlgorithmsTest(TestCase):
             algorithm = FirstChoiceHillClimbing(problem)
             res = algorithm.search().evaluate()
             min_res = res if res < min_res else min_res
-            self.assertTrue(min_res < 500)
+            print(res)
+            #self.assertTrue(min_res < 500)
 
     def test_hill_climbing_with_sideways_moves(self):
         min_res = math.inf
-        for i in range(8):
+        print('test_hill_climbing_with_sideways_moves ------ :')
+        for i in range(10):
             inputs = UserInputs(input_file, 160, 31, 10, list(), [3])
             problem = AssignmentSolver(inputs)
             problem.initialize()
@@ -58,11 +63,12 @@ class LocalSearchAlgorithmsTest(TestCase):
             res = algorithm.search().evaluate()
             print(res)
             min_res = res if res < min_res else min_res
-        self.assertEqual(min_res, 342)
+        #self.assertEqual(min_res, 342)
 
     def test_hill_climbing_with_random_walk(self):
         min_res = math.inf
-        for i in range(8):
+        print('test_hill_climbing_with_random_walk ------ :')
+        for i in range(10):
             inputs = UserInputs(input_file, 160, 31, 10, list(), [3])
             problem = AssignmentSolver(inputs)
             problem.initialize()
@@ -71,9 +77,10 @@ class LocalSearchAlgorithmsTest(TestCase):
             res = algorithm.search().evaluate()
             print(res)
             min_res = res if res < min_res else min_res
-        self.assertEqual(min_res, 342)'''
+        #self.assertEqual(min_res, 342)'''
 
     def test_random_restart_hill_climbing(self):
+        print('HC ------ :')
         inputs = UserInputs(input_file, 160, 31, 10, list(), [3])
         problem = AssignmentSolver(inputs)
         problem.initialize()
@@ -84,6 +91,7 @@ class LocalSearchAlgorithmsTest(TestCase):
         #self.assertEqual(res, 342)
 
     def test_random_restart_hill_climbing_with_sideways_moves(self):
+        print('Sideways ------ :')
         inputs = UserInputs(input_file, 160, 31, 10, list(), [3])
         problem = AssignmentSolver(inputs)
         problem.initialize()
@@ -94,13 +102,24 @@ class LocalSearchAlgorithmsTest(TestCase):
         #self.assertEqual(res, 342)
 
     def test_random_restart_hill_climbing_with_random_walk(self):
+        print('Walk ------ :')
         inputs = UserInputs(input_file, 160, 31, 10, list(), [3])
         problem = AssignmentSolver(inputs)
         problem.initialize()
 
         algorithm = RandomRestartHillClimbing(problem, options={'nprocs': nprocs, 'random_walk': True})
         res = algorithm.search()
-        print(res)
+        print(res.evaluate())
+        #self.assertEqual(res, 342)
+
+    def test_random_restart_hill_climbing_hybrid(self):
+        print('Hybrid ------ :')
+        inputs = UserInputs(input_file, 160, 31, 10, list(), [3])
+        problem = AssignmentSolver(inputs)
+        problem.initialize()
+
+        algorithm = RandomRestartHillClimbingHybrid(problem, options={'nprocs': nprocs})
+        res = algorithm.search()
         print(res.evaluate())
         #self.assertEqual(res, 342)
 
@@ -115,7 +134,8 @@ class LocalSearchAlgorithmsTest(TestCase):
         #self.assertEqual(res, 342)
 
     def test_simulated_annealing_repeated(self):
-        res = min(self.simulated_annealing_test_once() for x in range(1))
+        print('sim ann ------ :')
+        res = min(self.simulated_annealing_test_once() for x in range(32))
         print(res)
         # self.assertEqual(res, 342)
 

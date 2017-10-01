@@ -9,7 +9,7 @@ from collections import namedtuple
 from functools import reduce
 from itertools import product
 from local_search_algorithms import LocalSearchProblem
-from local_search_algorithms import RandomRestartHillClimbing
+from local_search_algorithms import RandomRestartHillClimbingHybrid
 
 
 class User:
@@ -136,7 +136,7 @@ def main():
     problem = AssignmentSolver()
     problem.initialize()
 
-    algorithm = RandomRestartHillClimbing(problem, options={'nprocs':32, 'random_walk': True})
+    algorithm = RandomRestartHillClimbingHybrid(problem, options={'nprocs':32})
     res = algorithm.search()
     lines = [' '.join(map(lambda user: user.user_id, group.members)) for group in res.groups if len(group.members) != 0]
     lines.append(str(res.evaluate()))
