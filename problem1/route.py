@@ -14,11 +14,23 @@
 #  UNIFORM    distance         0.314
 #  UNIFORM      time           0.317
 #    ASTAR    segments         0.299
-#    ASTAR    distance         0.320
-#    ASTAR      time           0.845
+#    ASTAR    distance         0.290
+#    ASTAR      time           0.298
+
+# Testing city pair: Columbus,_Ohio Chicago,_Illinois
+# algorithm cost_function running_time
+#    BFS        N/A            0.317
+#    DFS        N/A            0.910
+#  UNIFORM    segments         0.310
+#  UNIFORM    distance         0.380
+#  UNIFORM      time           0.400
+#    ASTAR    segments         0.309
+#    ASTAR    distance         0.297
+#    ASTAR      time           0.327
+
 #
 # Comparing BFS and DFS, BFS only requires 31% of the running time that DFS takes.
-# Comparing UNIFORM and ASTAR, on average UNIFORM is faster, and on average it requires 54% of the running time that ASTAR takes.
+# Comparing UNIFORM and ASTAR, on average ASTAR is faster, and on average it only requires 78% of the running time that UNIFORM takes.
 
 # (4) For distance the heuristic function I am using is the great circle distance given longitude and latitude of the two city,
 # this heuristic function is admissible and consistent, it's working good and can find the routing solution with minimal distance, 
@@ -27,8 +39,8 @@
 # For time the heuristic function I am using is the great circle distance/maximal speed limit, given longitude and latitude of the 
 # two city, this heuristic function is admissible and consistent, it's working good and can find the routing solution with minimal 
 # time, to make it better I will check whether there exist direct path to the goal even if pyhsically the city is close to the goal,
-# also it will be helpful to take different speed limit into consideration since short path with low spped limit might takes longer 
-# time to travel. 
+# also it will be helpful to take different speed limit into consideration since short path with low speed limit might still take 
+# longer time to travel. 
 
 import sys
 import numpy as np
@@ -83,8 +95,13 @@ def succ_paths_astar(path, cost_func, end_city):
 			tmp[1] += float(s[1])/float(s[2])
 			time_count(tmp, end_city)
 			tmp[0] = tmp[1] + tmp[2]
-		# append to path successor
-		succ.append(tmp)
+		# append to path successor, only allow revisit if it decreases the cost
+		if s[0] not in minnow_hash_table:
+			minnow_hash_table[s[0]] = tmp[0]
+			succ.append(tmp)
+		elif s[0] in minnow_hash_table and tmp[0] < minnow_hash_table[s[0]]:
+			minnow_hash_table[s[0]] = tmp[0]
+			succ.append(tmp)
 	return succ
 
 
@@ -113,6 +130,8 @@ def ASTAR(start_city, end_city, cost_func):
 	fringe = []
 	# first value is g(s) + h(s), 2nd value is g(s), 3rd value is h(s)
 	heappush(fringe, [0, 0, 0, start_city])
+
+	minnow_hash_table[start_city] = 0;
 
 	while len(fringe) > 0:
 		path = heappop(fringe)
