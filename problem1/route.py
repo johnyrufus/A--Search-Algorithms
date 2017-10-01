@@ -234,6 +234,7 @@ if __name__ == '__main__':
 			path = BFS(start_city, end_city)
 		else:
 			path = UNIFORM(start_city, end_city, cost_func)
+			path = path[1:]
 		
 	# astar
 	if route_alg == 'astar':
@@ -241,7 +242,41 @@ if __name__ == '__main__':
 			path = BFS(start_city, end_city)
 		else:
 			path = ASTAR(start_city, end_city, cost_func)
-			path = [path[1]] + path[3:]
+			path = path[3:]
 
-	print path
+	# organize output format, cal total distance/time
+	total_distance = 0
+	total_time = 0
+	i = 0
 	
+	for city in path:
+		if i == len(path) - 1:
+			break
+
+		i += 1
+		nxt_city = path[i]
+
+		tmp_distance = 0
+		tmp_speedlim = 0
+
+		for s in segments_hash_table[city]:
+			if nxt_city == s[0]:
+				tmp_distance = s[1]
+				tmp_speedlim = s[2]
+
+		total_distance += float(tmp_distance)
+		total_time += float(tmp_distance)/float(tmp_speedlim)
+
+	header = []
+	header.append(total_distance)
+	header.append(total_time)	
+	output = header + path
+	output_str = ''
+
+	for item in output:
+		output_str += str(item)
+		output_str += ' '
+
+	new = output_str[:-1]
+	
+	print new
