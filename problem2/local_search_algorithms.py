@@ -4,7 +4,6 @@
 # Johny
 
 import abc
-import assign
 from multiprocessing import Queue, Process, Pool
 
 import random
@@ -144,7 +143,7 @@ class RandomRestartHillClimbing(LocalSearchAlgorithm):
 
     def search(self):
         q = Queue()
-        nprocs = self.options['nprocs'] if 'nprocs' in self.options else 16
+        nprocs = self.options['nprocs'] if 'nprocs' in self.options else 32
         procs = list()
         for i in range(nprocs):
             p = Process(target=self.worker, args=(q,))

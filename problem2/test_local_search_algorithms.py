@@ -99,8 +99,9 @@ class LocalSearchAlgorithmsTest(TestCase):
         problem.initialize()
 
         algorithm = RandomRestartHillClimbing(problem, options={'nprocs': nprocs, 'random_walk': True})
-        res = algorithm.search().evaluate()
+        res = algorithm.search()
         print(res)
+        print(res.evaluate())
         #self.assertEqual(res, 342)
 
     def simulated_annealing_test_once(self):

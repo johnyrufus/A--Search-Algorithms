@@ -9,6 +9,7 @@ from collections import namedtuple
 from functools import reduce
 from itertools import product
 from local_search_algorithms import LocalSearchProblem
+from local_search_algorithms import RandomRestartHillClimbing
 
 
 class User:
@@ -104,12 +105,12 @@ UserInputs = namedtuple('UserInputs', 'input_file k m n users max_members_in_gro
 
 class AssignmentSolver(LocalSearchProblem):
 
-    def __init__(self, user_inputs = None):
+    def __init__(self, user_inputs=None):
         self.user_inputs = user_inputs if user_inputs else self.get_inputs_from_user()
         super().__init__(AssignmentState(self.user_inputs))
 
     def get_inputs_from_user(self):
-        return UserInputs(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], list(), list())
+        return UserInputs(sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), list(), [3])
 
     def initialize(self):
         random.seed(datetime.now())
@@ -132,8 +133,15 @@ class AssignmentSolver(LocalSearchProblem):
 
 
 def main():
-    solver = AssignmentSolver()
+    problem = AssignmentSolver()
+    problem.initialize()
 
+    algorithm = RandomRestartHillClimbing(problem, options={'nprocs':32, 'random_walk': True})
+    res = algorithm.search()
+    lines = [' '.join(map(lambda user: user.user_id, group.members)) for group in res.groups]
+    lines.append(str(res.evaluate()))
+
+    print('\n'.join(lines))
 
 if __name__ == '__main__':
     main()
