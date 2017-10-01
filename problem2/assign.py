@@ -138,7 +138,7 @@ def main():
 
     algorithm = RandomRestartHillClimbing(problem, options={'nprocs':32, 'random_walk': True})
     res = algorithm.search()
-    lines = [' '.join(map(lambda user: user.user_id, group.members)) for group in res.groups]
+    lines = [' '.join(map(lambda user: user.user_id, group.members)) for group in res.groups if len(group.members) != 0]
     lines.append(str(res.evaluate()))
 
     print('\n'.join(lines))
