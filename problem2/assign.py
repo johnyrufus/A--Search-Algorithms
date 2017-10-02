@@ -12,6 +12,7 @@ from local_search_algorithms import LocalSearchProblem
 from local_search_algorithms import RandomRestartHillClimbingHybrid
 
 
+# User class for storing student preferences
 class User:
     def __init__(self, user_id, group_size=0, favorites=set(), oops=set()):
         self.user_id = user_id
@@ -23,6 +24,7 @@ class User:
         return "{} - {} - {} - {}".format(self.user_id, self.group_size, self.favorites, self.oops)
 
 
+# Group class for storing the assignment of students to groups
 class Group:
     def __init__(self, members):
         self.members = members
@@ -42,6 +44,7 @@ class Group:
             lambda acc, m: acc + (0 if m.group_size == 0 or m.group_size == len(self.members) else 1), self.members, 0)
 
 
+# Assignment state representing a state of the assignment problem.
 class AssignmentState:
     def __init__(self, inputs, groups=None):
         if groups is None:
@@ -103,6 +106,7 @@ class AssignmentState:
 UserInputs = namedtuple('UserInputs', 'input_file k m n users max_members_in_group')
 
 
+# The main problem class for Assignment solving.
 class AssignmentSolver(LocalSearchProblem):
 
     def __init__(self, user_inputs=None):
@@ -136,11 +140,12 @@ def main():
     problem = AssignmentSolver()
     problem.initialize()
 
+    # Use Parallel Random restart hill climbing with sideways moves and random walk hybrid
     algorithm = RandomRestartHillClimbingHybrid(problem, options={'nprocs':32})
     res = algorithm.search()
+
     lines = [' '.join(map(lambda user: user.user_id, group.members)) for group in res.groups if len(group.members) != 0]
     lines.append(str(res.evaluate()))
-
     print('\n'.join(lines))
 
 if __name__ == '__main__':

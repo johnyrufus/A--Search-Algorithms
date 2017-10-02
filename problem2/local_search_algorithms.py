@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # local_search_algorithms.py : Implement the local search algorithms
-# Simulate Annealing schedule function referred from textbook code - https://github.com/aimacode/
 # Johny
 
 import abc
@@ -12,6 +11,7 @@ import sys
 import copy
 
 
+# Base class for all search algorithms.
 class LocalSearchAlgorithm:
     def __init__(self, problem, options=None):
         self.problem = problem
@@ -21,6 +21,7 @@ class LocalSearchAlgorithm:
         pass
 
 
+# Base class for search problem.
 class LocalSearchProblem:
     def __init__(self, state=None):
         self.state = state
@@ -38,6 +39,7 @@ class LocalSearchProblem:
         return
 
 
+# Hill climbing algorithm
 class HillClimbing(LocalSearchAlgorithm):
 
     def search(self):
@@ -53,12 +55,10 @@ class HillClimbing(LocalSearchAlgorithm):
                 neighbor = self.problem.state.next_neighbor()
             if neighbor_min_state is not self.problem.state:
                 next_state = neighbor_min_state
-        #print('------------' + str(self.problem.state.evaluate()))
-        #print(self.problem.state.groups)
         return self.problem.state
 
 
-
+# Hill climbing algorithm with sideways moves permitted.
 class HillClimbingWithSidewaysMove(LocalSearchAlgorithm):
 
     def search(self):
@@ -86,6 +86,7 @@ class HillClimbingWithSidewaysMove(LocalSearchAlgorithm):
         return self.problem.state
 
 
+# First choice Hill climbing algorithm
 class FirstChoiceHillClimbing(LocalSearchAlgorithm):
 
     def search(self):
@@ -105,6 +106,7 @@ class FirstChoiceHillClimbing(LocalSearchAlgorithm):
         return self.problem.state
 
 
+# Hill climbing algorithm with random walks permitted.
 class HillClimbingWithRandomWalk(LocalSearchAlgorithm):
 
     def search(self):
@@ -127,6 +129,7 @@ class HillClimbingWithRandomWalk(LocalSearchAlgorithm):
         return self.problem.state
 
 
+# Parallel Random restart hill climbing algorithm, with options for sideways moves or random walk
 class RandomRestartHillClimbing(LocalSearchAlgorithm):
 
     def worker(self, q):
@@ -137,7 +140,6 @@ class RandomRestartHillClimbing(LocalSearchAlgorithm):
             algorithm = HillClimbingWithRandomWalk
         else:
             algorithm = HillClimbing
-        #print(algorithm.__name__)
         res = algorithm(self.problem).search()
         q.put(res)
 
@@ -157,13 +159,13 @@ class RandomRestartHillClimbing(LocalSearchAlgorithm):
         return min(res, key=lambda x: x.evaluate())
 
 
+# Parallel Random restart hill climbing algorithm, with both sideways moves and random walk hybrid
 class RandomRestartHillClimbingHybrid(LocalSearchAlgorithm):
 
     def worker(self, q, i):
         algorithms = {0: HillClimbingWithRandomWalk, 1: HillClimbingWithSidewaysMove}
         self.problem.initialize()
         algorithm = algorithms[i%2]
-        #print(algorithm.__name__)
         res = algorithm(self.problem).search()
         q.put(res)
 
@@ -183,6 +185,7 @@ class RandomRestartHillClimbingHybrid(LocalSearchAlgorithm):
         return min(res, key=lambda x: x.evaluate())
 
 
+# Simulated Annealing
 class SimulatedAnnealing(LocalSearchAlgorithm):
 
     def search(self):
@@ -204,6 +207,7 @@ class SimulatedAnnealing(LocalSearchAlgorithm):
                 break
         return self.problem.state
 
+    # Simulate Annealing schedule function referred from textbook code - https://github.com/aimacode/
     def exp_schedule(self, t, k=20, lam=0.005, limit=100):
         #print(t)
         return k * math.exp(-lam * t) if t < limit else 0

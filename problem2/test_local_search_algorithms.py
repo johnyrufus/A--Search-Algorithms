@@ -10,12 +10,12 @@ from local_search_algorithms import LocalSearchAlgorithm, LocalSearchProblem, Hi
     SimulatedAnnealing, RandomRestartHillClimbingHybrid
 from unittest import TestCase
 
-input_file = 'input_large_50.txt'
+input_file = 'input_large_10.txt'
 nprocs = 32
 
 class LocalSearchAlgorithmsTest(TestCase):
 
-    '''def test_hill_climbing1(self):
+    def test_hill_climbing1(self):
         inputs = UserInputs(input_file, 160, 31, 10, list(), [1])
         problem = AssignmentSolver(inputs)
         problem.initialize()
@@ -77,7 +77,7 @@ class LocalSearchAlgorithmsTest(TestCase):
             res = algorithm.search().evaluate()
             print(res)
             min_res = res if res < min_res else min_res
-        #self.assertEqual(min_res, 342)'''
+        #self.assertEqual(min_res, 342)
 
     def test_random_restart_hill_climbing(self):
         print('HC ------ :')
@@ -130,12 +130,13 @@ class LocalSearchAlgorithmsTest(TestCase):
 
         algorithm = SimulatedAnnealing(problem)
         res = algorithm.search().evaluate()
+        print(res)
         return res
         #self.assertEqual(res, 342)
 
     def test_simulated_annealing_repeated(self):
         print('sim ann ------ :')
-        res = min(self.simulated_annealing_test_once() for x in range(32))
+        res = min(self.simulated_annealing_test_once() for x in range(10))
         print(res)
         # self.assertEqual(res, 342)
 
