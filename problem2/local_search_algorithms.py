@@ -163,9 +163,9 @@ class RandomRestartHillClimbing(LocalSearchAlgorithm):
 class RandomRestartHillClimbingHybrid(LocalSearchAlgorithm):
 
     def worker(self, q, i):
-        algorithms = {0: HillClimbingWithRandomWalk, 1: HillClimbingWithSidewaysMove}
+        algorithms = {0: HillClimbingWithRandomWalk, 1: HillClimbingWithSidewaysMove, 2: HillClimbingWithSidewaysMove, 3: HillClimbingWithSidewaysMove}
         self.problem.initialize()
-        algorithm = algorithms[i%2]
+        algorithm = algorithms[i%4]
         res = algorithm(self.problem).search()
         q.put(res)
 
